@@ -2,20 +2,48 @@ package org.example.utilities;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 public class HttpServer {
     static Map<String, WebMethod> endPoints = new HashMap<>();
+    private static String staticFilesLocation = null;
 
     public static void get(String path, WebMethod handler) {
         endPoints.put(path, handler);
+    }
+
+    public static void staticfiles(String folder) {
+        staticFilesLocation = folder;
+    }
+
+    private static String serveStaticFile(String path, Response res) {
+        if (staticFilesLocation == null) return null;
+        if (path.equals("/") || path.isEmpty()) path = "/index.html";
+        String resourcePath = (staticFilesLocation + path).replaceAll("^/+", "");
+        try (InputStream is = HttpServer.class.getClassLoader().getResourceAsStream(resourcePath)) {
+            if (is == null) return null;
+            res.type(getContentType(path));
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private static String getContentType(String path) {
+        if (path.endsWith(".html")) return "text/html";
+        if (path.endsWith(".css"))  return "text/css";
+        if (path.endsWith(".js"))   return "application/javascript";
+        if (path.endsWith(".json")) return "application/json";
+        return "text/plain";
     }
 
     public static void main(String[] args) throws IOException, URISyntaxException {
@@ -69,17 +97,36 @@ public class HttpServer {
             Response res = new Response();
 
             WebMethod wm = endPoints.get(reqpath);
-            String body = (wm != null) ? wm.handle(req, res) : "My Web Site";
+            String outputLine;
 
-            String outputLine =
-                    "HTTP/1.1 " + res.getStatus() + " OK\r\n"
-                    + "Content-Type: " + res.getContentType() + "\r\n"
-                    + "\r\n"
-                    + "<!DOCTYPE html>"
-                    + "<html>"
-                    + "<head><meta charset=\"UTF-8\"><title>MicroFramework</title></head>"
-                    + "<body>" + body + "</body>"
-                    + "</html>";
+            if (wm != null) {
+                String body = wm.handle(req, res);
+                outputLine = "HTTP/1.1 " + res.getStatus() + " OK\r\n"
+                        + "Content-Type: " + res.getContentType() + "\r\n"
+                        + "\r\n"
+                        + "<!DOCTYPE html>"
+                        + "<html>"
+                        + "<head><meta charset=\"UTF-8\"><title>MicroFramework</title></head>"
+                        + "<body>" + body + "</body>"
+                        + "</html>";
+            } else {
+                String fileContent = serveStaticFile(reqpath, res);
+                if (fileContent != null) {
+                    outputLine = "HTTP/1.1 " + res.getStatus() + " OK\r\n"
+                            + "Content-Type: " + res.getContentType() + "\r\n"
+                            + "\r\n"
+                            + fileContent;
+                } else {
+                    outputLine = "HTTP/1.1 200 OK\r\n"
+                            + "Content-Type: text/html\r\n"
+                            + "\r\n"
+                            + "<!DOCTYPE html>"
+                            + "<html>"
+                            + "<head><meta charset=\"UTF-8\"><title>MicroFramework</title></head>"
+                            + "<body>My Web Site</body>"
+                            + "</html>";
+                }
+            }
 
             out.println(outputLine);
             out.close();

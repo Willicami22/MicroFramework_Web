@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MicroFramework Test</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <h1>MicroFramework Web</h1>
+
+    <section>
+        <h2>Static file serving</h2>
+        <p>If you can read this page, <code>staticfiles()</code> is working correctly.</p>
+    </section>
+
+    <section>
+        <h2>Dynamic endpoints</h2>
+        <div class="card">
+            <button onclick="callEndpoint('/pi')">GET /pi</button>
+            <button onclick="callEndpoint('/euler')">GET /euler</button>
+        </div>
+    </section>
+
+    <section>
+        <h2>Query parameter: <code>/Hello?name=</code></h2>
+        <div class="card">
+            <input id="nameInput" type="text" placeholder="Enter your name" />
+            <button onclick="callHello()">GET /Hello</button>
+        </div>
+    </section>
+
+    <section>
+        <h2>Response</h2>
+        <pre id="output">— no request yet —</pre>
+    </section>
+
+    <script src="/script.js"></script>
+</body>
+</html>
