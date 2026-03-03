@@ -8,7 +8,7 @@ import static org.example.utilities.HttpServer.get;
 public class MathServices {
     public static void main(String[] args) throws IOException, URISyntaxException {
         get("/pi", (req, res) -> "PI=" + Math.PI);
-        get("/Hello", (req, res) -> "Hello World");
+        get("/Hello", (req, res) -> "Hello " + req.getValues("name"));
         get("/euler", (req, res) -> euler());
 
         HttpServer.main(args);

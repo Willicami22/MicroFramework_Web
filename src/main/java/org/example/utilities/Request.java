@@ -23,6 +23,8 @@ public class Request {
 
     public String getQueryParam(String key) { return queryParams.getOrDefault(key, ""); }
 
+    public String getValues(String key) { return queryParams.getOrDefault(key, ""); }
+
     public Map<String, String> getQueryParams() { return queryParams; }
 
     public String getHeader(String name) { return headers.getOrDefault(name, ""); }
