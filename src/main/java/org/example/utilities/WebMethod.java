@@ -1,5 +1,6 @@
 package org.example.utilities;
 
+@FunctionalInterface
 public interface WebMethod {
-    public String execute();
+    String handle(Request req, Response res);
 }

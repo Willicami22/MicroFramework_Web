@@ -7,9 +7,9 @@ import java.net.URISyntaxException;
 import static org.example.utilities.HttpServer.get;
 public class MathServices {
     public static void main(String[] args) throws IOException, URISyntaxException {
-        get("/pi", () -> "PI=" + Math.PI);
-        get("/Hello", () -> "Hello World");
-        get("/euler",() -> euler());
+        get("/pi", (req, res) -> "PI=" + Math.PI);
+        get("/Hello", (req, res) -> "Hello World");
+        get("/euler", (req, res) -> euler());
 
         HttpServer.main(args);
     }
