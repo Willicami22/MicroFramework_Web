@@ -1,5 +1,7 @@
 package org.example.utilities;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,8 +36,11 @@ public class Request {
         if (query == null || query.isEmpty()) return params;
         for (String pair : query.split("&")) {
             String[] kv = pair.split("=", 2);
-            if (kv.length == 2) params.put(kv[0], kv[1]);
-            else if (kv.length == 1) params.put(kv[0], "");
+            if (kv.length == 2) params.put(
+                    URLDecoder.decode(kv[0], StandardCharsets.UTF_8),
+                    URLDecoder.decode(kv[1], StandardCharsets.UTF_8));
+            else if (kv.length == 1) params.put(
+                    URLDecoder.decode(kv[0], StandardCharsets.UTF_8), "");
         }
         return params;
     }
